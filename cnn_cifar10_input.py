@@ -1,16 +1,9 @@
 import numpy as np
-import pickle
-import os
-from six.moves import xrange  # pylint: disable=redefined-builtin
-import tensorflow as tf
 import os
 import sys
 import tarfile
 
 from six.moves import urllib
-
-# import download
-# from dataset import one_hot_encoded
 
 DEFAULT_DATA_PATH = "data/CIFAR-10/"
 
@@ -24,12 +17,6 @@ IMG_CHANNELS = 3
 # Length of an image when flattened to a 1-dim array.
 IMG_SIZE_FLAT = IMG_WIDTH * IMG_HEIGHT * IMG_CHANNELS
 NUM_CLASSES = 10
-
-# TRAIN
-TRAIN_NUM_FILES = 5
-TRAIN_IMG_PER_FILE = 10000
-TRAIN_TOTAL_NUM_IMG = TRAIN_NUM_FILES * TRAIN_IMG_PER_FILE
-
 
 def _unpickle(file):
     import pickle
@@ -108,17 +95,4 @@ def load_label_names():
 
 
 def one_hot_encoded(class_numbers, num_classes):
-    """
-    Generate the One-Hot encoded class-labels from an array of integers.
-    For example, if class_number=2 and num_classes=4 then
-    the one-hot encoded label is the float array: [0. 0. 1. 0.]
-    :param class_numbers:
-        Array of integers with class-numbers.
-        Assume the integers are from zero to num_classes-1 inclusive.
-    :param num_classes:
-        Number of classes.
-    :return:
-        2-dim array of shape: [len(class_numbers), num_classes]
-    """
-
     return np.eye(num_classes, dtype=float)[class_numbers]
