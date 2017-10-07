@@ -107,7 +107,7 @@ def buildModel(image):
 
     # local3
     # Move everything into depth so we can perform a single matrix multiply.
-    reshape = tf.reshape(pool2, [50, -1])
+    reshape = tf.reshape(pool2, [-1, 4096])
     printShape(reshape)
     dim = reshape.get_shape()[1].value
     wl3 = _variable_with_weight_decay('weightsl3', shape=[dim, 384],
@@ -135,7 +135,7 @@ def get_loss(logits, labels):
 
 def main(argv=None):  # pylint: disable=unused-argument
     trainer = trainer_input.Trainer(50)
-    image_placeholder = tf.placeholder(tf.float32, shape=[50, IMAGE_SIZE, IMAGE_SIZE, 3])
+    image_placeholder = tf.placeholder(tf.float32, shape=[None, IMAGE_SIZE, IMAGE_SIZE, 3])
 
     # 10 hot vectors (0 - 9)
     y_correct_labels = tf.placeholder(tf.float32, shape=[None, 10])
@@ -160,7 +160,7 @@ def main(argv=None):  # pylint: disable=unused-argument
                 print('test accuracy %g' % accuracy.eval(
                     feed_dict={image_placeholder: batch, y_correct_labels: labels}))
 
-        validation_images, validation_labels = trainer.test_batch()
+        validation_images, validation_labels = trainer.test_batch(10)
         print('test accuracy %g' % accuracy.eval(
             feed_dict={image_placeholder: validation_images, y_correct_labels: validation_labels}))
 
