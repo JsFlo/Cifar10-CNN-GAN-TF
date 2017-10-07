@@ -18,6 +18,7 @@ IMG_CHANNELS = 3
 IMG_SIZE_FLAT = IMG_WIDTH * IMG_HEIGHT * IMG_CHANNELS
 NUM_CLASSES = 10
 
+
 def _unpickle(file):
     import pickle
     print("Extracting data: " + file)
@@ -45,7 +46,7 @@ def _convert_images(raw_images):
 
 
 def _load_images_labels(filename):
-    raw_data = _unpickle(filename)
+    raw_data = _unpickle(DEFAULT_DATA_PATH + "cifar-10-batches-py/" + filename)
 
     # 10,000 * 3072 ( 32 x 32 x 3 )
     flattened_images = raw_data[b'data']

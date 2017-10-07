@@ -13,6 +13,7 @@ NUM_CLASSES = 10
 
 class Trainer:
     def __init__(self, batch_size):
+        input.maybe_download_and_extract()
         self.step = 0
         images, labels = self._get_train_images_labels()
         total = len(images)
@@ -31,7 +32,7 @@ class Trainer:
         return images, labels
 
     def test_batch(self, batch_size):
-        images, labels = input._load_images_labels("cifar_batches/test_batch")
+        images, labels = input._load_images_labels("test_batch")
         total = len(images)
         images_batch = np.split(images, total / batch_size)
         labels_batch = np.split(labels, total / batch_size)
@@ -42,7 +43,7 @@ class Trainer:
         all_labels = np.zeros(shape=[TRAIN_TOTAL_NUM_IMG, NUM_CLASSES], dtype=int)
         begin = 0
         for i in range(TRAIN_NUM_FILES):
-            images_batch, labels_batch = input._load_images_labels(filename="cifar_batches/data_batch_" + str(i + 1))
+            images_batch, labels_batch = input._load_images_labels(filename="data_batch_" + str(i + 1))
             num_images = len(images_batch)
 
             # End-index for the current batch.
