@@ -7,8 +7,8 @@ import cnn_cifar10_trainer as trainer_input
 IMAGE_SIZE = 32
 NUM_CLASSES = 10
 
-TRAIN_STEPS = 125
-PRINT_TRAIN_FREQ = 25
+TRAIN_STEPS = 5000
+PRINT_TRAIN_FREQ = 100
 
 
 def printShape(tensor):
@@ -182,7 +182,7 @@ def main(argv=None):
             train_step.run(feed_dict={image_placeholder: batch, y_correct_labels: labels, keep_prob: 0.5})
 
             if i % PRINT_TRAIN_FREQ == 0:
-                print("step: " + i)
+                print("step: {}".format(i))
                 print('test accuracy %g' % accuracy.eval(
                     feed_dict={image_placeholder: batch, y_correct_labels: labels, keep_prob: 1.0}))
 
