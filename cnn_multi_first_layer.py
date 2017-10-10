@@ -114,24 +114,16 @@ def buildMultiModel(image, keep_prob):
     row3_out = tf.nn.relu(row3_conv3_pre_activation)
     printShape(row3_out)
 
-    # could probably be changed with one tf.concat called
-    row1_reshape = tf.reshape(row1_out, [-1, 8 * 8 * 128])
-    printShape(row1_reshape)
-    row2_reshape = tf.reshape(row2_out, [-1, 8 * 8 * 128])
-    printShape(row2_reshape)
-    row3_reshape = tf.reshape(row3_out, [-1, 8 * 8 * 128])
-    printShape(row3_reshape)
-
-    row1_row2 = tf.concat([row1_reshape, row2_reshape], 1)
-    printShape(row1_row2)
-    row1_row2_row3 = tf.concat([row1_row2, row3_reshape], 1)
+    row1_row2_row3 = tf.concat([tf.concat([row1_out, row2_out], 3), row3_out], 3)
     printShape(row1_row2_row3)
+    flattened_layer = tf.reshape(row1_row2_row3, [-1, 8 * 8 * 384])
+    printShape(flattened_layer)
 
     # fc1
-    dim = row1_row2_row3.get_shape()[1].value
+    dim = flattened_layer.get_shape()[1].value
     fc1_w = _variable_with_weight_decay('fc1w', shape=[dim, 4096],
                                         stddev=0.04, wd=0.004)
-    fc1 = tf.nn.relu(tf.matmul(row1_row2_row3, fc1_w) + variable('fc1b', [4096], tf.constant_initializer(0.1)))
+    fc1 = tf.nn.relu(tf.matmul(flattened_layer, fc1_w) + variable('fc1b', [4096], tf.constant_initializer(0.1)))
     printShape(fc1)
 
     # fc2
