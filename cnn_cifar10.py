@@ -3,6 +3,7 @@ from __future__ import division
 from __future__ import print_function
 import tensorflow as tf
 import cnn_cifar10_trainer as trainer_input
+import numpy as np
 
 IMAGE_SIZE = 32
 NUM_CLASSES = 10
@@ -133,6 +134,12 @@ def get_loss(logits, labels):
     return tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=labels, logits=logits))
 
 
+def pretty_loss(loss_values, average_mean_num):
+    import matplotlib.pyplot as plt
+    plt.plot([np.mean(loss_values[i - average_mean_num:i]) for i in range(len(loss_values))])
+    plt.show()
+    plt.savefig("loss_over_time.png")
+
 def main(argv=None):  # pylint: disable=unused-argument
     trainer = trainer_input.Trainer(50)
     image_placeholder = tf.placeholder(tf.float32, shape=[None, IMAGE_SIZE, IMAGE_SIZE, 3])
@@ -149,20 +156,25 @@ def main(argv=None):  # pylint: disable=unused-argument
 
     init = tf.initialize_all_variables()
 
+    loss_values = []
+    trained_steps = 0
     with tf.Session() as sess:
         sess.run(init)
         for i in range(TRAIN_STEPS):
+            trained_steps = trained_steps + 1
             batch, labels = trainer.next_batch()
-
-            train_step.run(feed_dict={image_placeholder: batch, y_correct_labels: labels})
+            _, loss_value = sess.run([train_step, loss], feed_dict={image_placeholder: batch, y_correct_labels: labels})
+            loss_values.append(loss_value)
 
             if i % PRINT_TRAIN_FREQ == 0:
+                print("loss: {}".format(loss_value))
                 print('test accuracy %g' % accuracy.eval(
                     feed_dict={image_placeholder: batch, y_correct_labels: labels}))
 
         validation_images, validation_labels = trainer.test_batch(10000)
         print('test accuracy %g' % accuracy.eval(
             feed_dict={image_placeholder: validation_images, y_correct_labels: validation_labels}))
+        pretty_loss(loss_values, 50)
 
 
 if __name__ == '__main__':
