@@ -136,9 +136,10 @@ def get_loss(logits, labels):
 
 def pretty_loss(loss_values, average_mean_num):
     import matplotlib.pyplot as plt
-    plt.plot([np.mean(loss_values[i - average_mean_num:i]) for i in range(len(loss_values))])
+    plt.plot([np.mean(loss_values[i]) for i in range(len(loss_values))])
     plt.show()
     plt.savefig("loss_over_time.png")
+
 
 def main(argv=None):  # pylint: disable=unused-argument
     trainer = trainer_input.Trainer(50)
@@ -167,6 +168,7 @@ def main(argv=None):  # pylint: disable=unused-argument
             loss_values.append(loss_value)
 
             if i % PRINT_TRAIN_FREQ == 0:
+                print("step: {}".format(i))
                 print("loss: {}".format(loss_value))
                 print('test accuracy %g' % accuracy.eval(
                     feed_dict={image_placeholder: batch, y_correct_labels: labels}))
