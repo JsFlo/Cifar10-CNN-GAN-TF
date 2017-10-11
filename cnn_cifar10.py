@@ -4,12 +4,13 @@ from __future__ import print_function
 import tensorflow as tf
 import cnn_cifar10_trainer as trainer_input
 import numpy as np
+import matplotlib.pyplot as plt
 
 IMAGE_SIZE = 32
 NUM_CLASSES = 10
 
-TRAIN_STEPS = 500000
-PRINT_TRAIN_FREQ = 1000
+TRAIN_STEPS = 5000
+PRINT_TRAIN_FREQ = 100
 
 
 def printShape(tensor):
@@ -134,11 +135,39 @@ def get_loss(logits, labels):
     return tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=labels, logits=logits))
 
 
-def pretty_loss(loss_values, average_mean_num):
-    import matplotlib.pyplot as plt
+def pretty_loss(loss_values):
     plt.plot([np.mean(loss_values[i]) for i in range(len(loss_values))])
     plt.show()
     plt.savefig("loss_over_time.png")
+    plt.close()
+
+
+def pretty_accuracy(accuracy):
+    plt.plot([np.mean(accuracy[i]) for i in range(len(accuracy))])
+    plt.show()
+    plt.savefig("accuracy_over_time.png")
+    plt.close()
+
+
+def pretty_loss_avg(loss_values, avg):
+    plt.plot([np.mean(loss_values[i - avg:i]) for i in range(len(loss_values))])
+    plt.show()
+    plt.savefig("loss_over_time_avg.png")
+    plt.close()
+
+
+def pretty_accuracy_avg(accuracy, avg):
+    plt.plot([np.mean(accuracy[i - avg:i]) for i in range(len(accuracy))])
+    plt.show()
+    plt.savefig("accuracy_over_time_avg.png")
+    plt.close()
+
+
+def print_loss_accuracy(loss_values, accuracy):
+    pretty_loss_avg(loss_values, 50)
+    pretty_loss(loss_values)
+    pretty_accuracy(accuracy)
+    pretty_accuracy_avg(accuracy, 50)
 
 
 def main(argv=None):  # pylint: disable=unused-argument
@@ -157,7 +186,9 @@ def main(argv=None):  # pylint: disable=unused-argument
 
     init = tf.initialize_all_variables()
 
+    # Should start using "summaries"(tensorboard) instead of this
     loss_values = []
+    accuracy_values = []
     trained_steps = 0
     with tf.Session() as sess:
         sess.run(init)
@@ -170,13 +201,14 @@ def main(argv=None):  # pylint: disable=unused-argument
             if i % PRINT_TRAIN_FREQ == 0:
                 print("step: {}".format(i))
                 print("loss: {}".format(loss_value))
-                print('test accuracy %g' % accuracy.eval(
-                    feed_dict={image_placeholder: batch, y_correct_labels: labels}))
+                accuracy_value = sess.run(accuracy, feed_dict={image_placeholder: batch, y_correct_labels: labels})
+                accuracy_values.append(accuracy_value)
+                print('test accuracy %g' % accuracy_value)
 
         validation_images, validation_labels = trainer.test_batch(10000)
         print('test accuracy %g' % accuracy.eval(
             feed_dict={image_placeholder: validation_images, y_correct_labels: validation_labels}))
-        pretty_loss(loss_values, 50)
+        print_loss_accuracy(loss_values, accuracy_values)
 
 
 if __name__ == '__main__':
