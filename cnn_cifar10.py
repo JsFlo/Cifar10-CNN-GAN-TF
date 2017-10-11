@@ -7,8 +7,8 @@ import cnn_cifar10_trainer as trainer_input
 IMAGE_SIZE = 32
 NUM_CLASSES = 10
 
-TRAIN_STEPS = 125
-PRINT_TRAIN_FREQ = 25
+TRAIN_STEPS = 500000
+PRINT_TRAIN_FREQ = 1000
 
 
 def printShape(tensor):
@@ -160,7 +160,7 @@ def main(argv=None):  # pylint: disable=unused-argument
                 print('test accuracy %g' % accuracy.eval(
                     feed_dict={image_placeholder: batch, y_correct_labels: labels}))
 
-        validation_images, validation_labels = trainer.test_batch(10)
+        validation_images, validation_labels = trainer.test_batch(10000)
         print('test accuracy %g' % accuracy.eval(
             feed_dict={image_placeholder: validation_images, y_correct_labels: validation_labels}))
 
