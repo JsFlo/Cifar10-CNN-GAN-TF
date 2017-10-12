@@ -167,7 +167,7 @@ def print_loss_accuracy(loss_values, accuracy):
     pretty_loss_avg(loss_values, 50)
     pretty_loss(loss_values)
     pretty_accuracy(accuracy)
-    pretty_accuracy_avg(accuracy, 50)
+    pretty_accuracy_avg(accuracy, 3)
 
 
 def main(argv=None):  # pylint: disable=unused-argument
