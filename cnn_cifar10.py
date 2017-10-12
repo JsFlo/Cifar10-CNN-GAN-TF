@@ -9,8 +9,8 @@ import matplotlib.pyplot as plt
 IMAGE_SIZE = 32
 NUM_CLASSES = 10
 
-TRAIN_STEPS = 5000
-PRINT_TRAIN_FREQ = 100
+TRAIN_STEPS = 500000
+PRINT_TRAIN_FREQ = 1000
 
 
 def printShape(tensor):
@@ -58,8 +58,12 @@ my_weights = {
                                        wd=0.0),
     'wl4': _variable_with_weight_decay('weightsl4', shape=[384, 192],
                                        stddev=0.04, wd=0.004),
-    'wout': _variable_with_weight_decay('weightsout', [192, NUM_CLASSES],
-                                        stddev=1 / 192.0, wd=0.0)
+    'w5': _variable_with_weight_decay('w5', [192, NUM_CLASSES],
+                                      stddev=1 / 192.0, wd=0.0),
+    'w6': _variable_with_weight_decay('w6', shape=[NUM_CLASSES, 200],
+                                      stddev=0.04, wd=0.004),
+    'w7': _variable_with_weight_decay('w7', shape=[200, NUM_CLASSES],
+                                      stddev=1 / 200, wd=0.000)
 }
 
 my_biases = {
@@ -67,7 +71,9 @@ my_biases = {
     'bc2': variable('biasesc2', [64], tf.constant_initializer(0.1)),
     'bl3': variable('biasesc3', [384], tf.constant_initializer(0.1)),
     'bl4': variable('biasesl4', [192], tf.constant_initializer(0.1)),
-    'bout': variable('biasesout', [NUM_CLASSES], tf.constant_initializer(0.0))
+    'b5': variable('b5', [NUM_CLASSES], tf.constant_initializer(0.0)),
+    'b6': variable('b6', [200], tf.constant_initializer(0.1)),
+    'b7': variable('b7', [NUM_CLASSES], tf.constant_initializer(0.0)),
 }
 
 
@@ -121,11 +127,13 @@ def buildModel(image):
     local4 = tf.nn.relu(tf.matmul(local3, my_weights['wl4']) + my_biases['bl4'])
     printShape(local4)
 
-    # linear layer(WX + b),
-    # We don't apply softmax here because
-    # tf.nn.sparse_softmax_cross_entropy_with_logits accepts the unscaled logits
-    # and performs the softmax internally for efficiency.
-    softmax_linear = tf.add(tf.matmul(local4, my_weights['wout']), my_biases['bout'])
+    intermediate_out_5 = tf.add(tf.matmul(local4, my_weights['w5']), my_biases['b5'])
+    printShape(intermediate_out_5)
+
+    local6 = tf.nn.relu(tf.matmul(intermediate_out_5, my_weights['w6']) + my_biases['b6'])
+    printShape(local6)
+
+    softmax_linear = tf.add(tf.matmul(local6, my_weights['w7']), my_biases['b7'])
     printShape(softmax_linear)
 
     return softmax_linear
