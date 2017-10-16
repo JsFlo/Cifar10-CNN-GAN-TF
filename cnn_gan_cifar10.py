@@ -109,7 +109,7 @@ my_weights = {
                                       stddev=1 / 192.0, wd=0.0),
     'w6': _variable_with_weight_decay('w6', shape=[10, 200],
                                       stddev=0.04, wd=0.004),
-    'w7': _variable_with_weight_decay('w7', shape=[200, 1],
+    'w7': _variable_with_weight_decay('w7', shape=[200, 10],
                                       stddev=1 / 200, wd=0.000)
 }
 
@@ -120,7 +120,7 @@ my_biases = {
     'bl4': variable('biasesl4', [192], tf.constant_initializer(0.1)),
     'b5': variable('b5', [10], tf.constant_initializer(0.0)),
     'b6': variable('b6', [200], tf.constant_initializer(0.1)),
-    'b7': variable('b7', [1], tf.constant_initializer(0.0)),
+    'b7': variable('b7', [10], tf.constant_initializer(0.0)),
 }
 
 generator_w = {
