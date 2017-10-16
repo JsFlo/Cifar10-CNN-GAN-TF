@@ -368,7 +368,7 @@ def main(argv=None):  # pylint: disable=unused-argument
                generator_b['gb4'], generator_b['gb5'], generator_b['gb6'], generator_b['gb7']]
 
     G_solver = tf.train.AdamOptimizer().minimize(G_loss, var_list=theta_G)
-    trainer = trainer_input.Trainer(50)
+    trainer = trainer_input.Trainer(batch_size=BATCH_SIZE)
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
 
