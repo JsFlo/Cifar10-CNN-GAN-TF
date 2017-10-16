@@ -22,7 +22,7 @@ class Trainer:
         self.label_batch = np.split(labels, self.num_batches)
 
     def next_batch(self):
-        if (self.step >= self.num_batches):
+        if (self.step >= int(self.num_batches)):
             self.step = 0
         images = self.image_batch[self.step]
         labels = self.label_batch[self.step]
