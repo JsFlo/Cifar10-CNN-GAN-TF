@@ -35,7 +35,7 @@ def plot(samples):
         ax.set_yticklabels([])
         ax.set_aspect('equal')
         # convert 784 to 28 x 28
-        plt.imshow(sample.reshape(28, 28), cmap='Greys_r')
+        plt.imshow(sample.reshape(32, 32, 3), cmap='Greys_r')
 
     return fig
 
