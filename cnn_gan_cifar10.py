@@ -9,8 +9,8 @@ import matplotlib.gridspec as gridspec
 
 IMAGE_SIZE = 32
 
-TRAINING_STEPS = 30
-SAMPLE_FREQUENCY = 10
+TRAINING_STEPS = 5000
+SAMPLE_FREQUENCY = 50
 DEBUG_PRINT_FREQUENCY = 10000
 SAMPLE_WIDTH = 3
 SAMPLE_HEIGHT = 3
@@ -127,7 +127,7 @@ generator_w = {
                                        stddev=0.04,
                                        wd=0.004),
     'gw4': _variable_with_weight_decay('gw4',
-                                       shape=[4096, 4096],
+                                       shape=[129792, 4096],
                                        stddev=0.04,
                                        wd=0.004),
     'gw5': _variable_with_weight_decay('gw5',
