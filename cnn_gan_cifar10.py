@@ -137,7 +137,7 @@ generator_w = {
                                        stddev=0.04,
                                        wd=0.004),
     'gw4': _variable_with_weight_decay('gw4',
-                                       shape=[256 * 5 * 5 * 3, 4096],
+                                       shape=[256 * 5 * 5, 4096],
                                        stddev=0.04,
                                        wd=0.004),
     'gw5': _variable_with_weight_decay('gw5',
@@ -210,7 +210,7 @@ def generator(image):
 
     # local4
     # Move everything into depth so we can perform a single matrix multiply.
-    reshape = tf.reshape(conv3_pool1, [-1, 256 * 5 * 5 * 3])
+    reshape = tf.reshape(conv3_pool1, [-1, 256 * 5 * 5])
     printShape("reshape", reshape)
 
     local4 = tf.nn.relu(tf.matmul(reshape, generator_w['gw4']) + generator_b['gb4'])
