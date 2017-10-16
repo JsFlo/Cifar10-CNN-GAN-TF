@@ -348,9 +348,11 @@ def main(argv=None):  # pylint: disable=unused-argument
     x_image = tf.placeholder(tf.float32, shape=[None, 32, 32, 3])
     printShape("real_output_plaeholder", x_image)
     D_real, D_logit_real = discriminator(x_image)
+    printShape("real_out", D_real)
 
     # discriminator will take in the fake images the generator generates
     D_fake, D_logit_fake = discriminator(G_sample)
+    printShape("disc_out", D_fake)
 
     D_loss = -tf.reduce_mean(tf.log(D_real) + tf.log(1. - D_fake))
     G_loss = -tf.reduce_mean(tf.log(D_fake))
