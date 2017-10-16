@@ -9,8 +9,8 @@ import matplotlib.gridspec as gridspec
 
 IMAGE_SIZE = 32
 
-TRAINING_STEPS = 5000
-SAMPLE_FREQUENCY = 50
+TRAINING_STEPS = 50
+SAMPLE_FREQUENCY = 10
 DEBUG_PRINT_FREQUENCY = 10000
 SAMPLE_WIDTH = 3
 SAMPLE_HEIGHT = 3
@@ -25,18 +25,18 @@ def sample_Z(m, n):
 
 def plot(samples):
     fig = plt.figure(figsize=(SAMPLE_WIDTH, SAMPLE_HEIGHT))
-    gs = gridspec.GridSpec(SAMPLE_WIDTH, SAMPLE_HEIGHT)
+    gs = gridspec.GridSpec(1, 1)
     gs.update(wspace=0.05, hspace=0.05)
 
-    for i, sample in enumerate(samples):
-        ax = plt.subplot(gs[i])
-        plt.axis('off')
-        ax.set_xticklabels([])
-        ax.set_yticklabels([])
-        ax.set_aspect('equal')
-        # convert 784 to 28 x 28
-        plt.imshow(sample.reshape(32, 32, 3), cmap='Greys_r')
-
+    # for i, sample in enumerate(samples):
+    ax = plt.subplot(gs[0])
+    plt.axis('off')
+    #   plt.axis('off')
+    #  ax.set_xticklabels([])
+    # ax.set_yticklabels([])
+    # ax.set_aspect('equal')
+    # convert 784 to 28 x 28
+    plt.imshow(samples[0].reshape(32, 32, 3), cmap='Greys_r')
     return fig
 
 
@@ -372,26 +372,27 @@ def main(argv=None):  # pylint: disable=unused-argument
                generator_b['gb4'], generator_b['gb5'], generator_b['gb6'], generator_b['gb7']]
 
     G_solver = tf.train.AdamOptimizer().minimize(G_loss, var_list=theta_G)
-    trainer = trainer_input.Trainer(batch_size=BATCH_SIZE)
+    trainer = trainer_input.Trainer(128)
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
 
     for it in range(TRAINING_STEPS):
 
         train_batch, labels = trainer.next_batch()
+        print(len(train_batch))
 
         if it % SAMPLE_FREQUENCY == 0:
             # sample the generator and save the plots
             samples = sess.run(G_sample,
-                               feed_dict={Z: sample_Z(NUMBER_OF_SAMPLES, numberOfInputs)})
+                               feed_dict={Z: sample_Z(129, numberOfInputs)})
             fig = plot(samples)
             plt.savefig('{}{}.png'.format(FILE_SAMPLE_OUTPUT_PATH, str(it).zfill(3)), bbox_inches='tight')
             plt.close(fig)
 
         _, D_loss_curr = sess.run([D_solver, D_loss],
-                                  feed_dict={x_image: train_batch, Z: sample_Z(BATCH_SIZE, numberOfInputs)})
+                                  feed_dict={x_image: train_batch, Z: sample_Z(129, numberOfInputs)})
         _, G_loss_curr = sess.run([G_solver, G_loss],
-                                  feed_dict={Z: sample_Z(BATCH_SIZE, numberOfInputs)})
+                                  feed_dict={Z: sample_Z(129, numberOfInputs)})
 
         if it % DEBUG_PRINT_FREQUENCY == 0:
             print('Iter: {}'.format(it))
