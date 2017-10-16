@@ -80,6 +80,16 @@ def pool(x, name):
                           padding='SAME', name=name)
 
 
+def pool3(x, name):
+    return tf.nn.max_pool(x, ksize=[1, 3, 3, 1], strides=[1, 3, 3, 1],
+                          padding='SAME', name=name)
+
+
+def pool4(x, name):
+    return tf.nn.max_pool(x, ksize=[1, 3, 3, 1], strides=[1, 4, 4, 1],
+                          padding='SAME', name=name)
+
+
 my_weights = {
     'wc1': _variable_with_weight_decay('weightsc1',
                                        shape=[5, 5, 3, 64],
@@ -127,19 +137,19 @@ generator_w = {
                                        stddev=0.04,
                                        wd=0.004),
     'gw4': _variable_with_weight_decay('gw4',
-                                       shape=[129792, 4096],
+                                       shape=[256 * 5 * 5 * 3, 4096],
                                        stddev=0.04,
                                        wd=0.004),
     'gw5': _variable_with_weight_decay('gw5',
-                                       [4096, 4096],
+                                       [4096, 3200],
                                        stddev=1 / 4096.0,
                                        wd=0.0),
     'gw6': _variable_with_weight_decay('gw6',
-                                       shape=[4096, 4096],
+                                       shape=[3200, 3172],
                                        stddev=0.04,
                                        wd=0.004),
     'gw7': _variable_with_weight_decay('gw7',
-                                       shape=[4096, 3072],
+                                       shape=[3172, 3072],
                                        stddev=1 / 4096,
                                        wd=0.000)
 }
@@ -149,8 +159,8 @@ generator_b = {
     'gb2': variable('gb2', [128], tf.constant_initializer(0.1)),
     'gb3': variable('gb3', [256], tf.constant_initializer(0.1)),
     'gb4': variable('gb4', [4096], tf.constant_initializer(0.1)),
-    'gb5': variable('gb5', [4096], tf.constant_initializer(0.0)),
-    'gb6': variable('gb6', [4096], tf.constant_initializer(0.1)),
+    'gb5': variable('gb5', [3200], tf.constant_initializer(0.0)),
+    'gb6': variable('gb6', [3172], tf.constant_initializer(0.1)),
     'gb7': variable('gb7', [3072], tf.constant_initializer(0.0)),
 }
 
@@ -181,7 +191,7 @@ def generator(image):
                             alpha=0.001 / 9.0,
                             beta=0.75,
                             name='norm2')
-    conv2_pool1 = pool(conv2_norm1, 'pool2')
+    conv2_pool1 = pool3(conv2_norm1, 'pool2')
     printShape("conv2_pool2", conv2_pool1)
 
     # conv2
@@ -195,12 +205,12 @@ def generator(image):
                             alpha=0.001 / 9.0,
                             beta=0.75,
                             name='norm3')
-    conv3_pool1 = pool(conv3_norm1, 'pool3')
+    conv3_pool1 = pool4(conv3_norm1, 'pool3')
     printShape("conv3_pool1", conv3_pool1)
 
     # local4
     # Move everything into depth so we can perform a single matrix multiply.
-    reshape = tf.reshape(conv3_pool1, [-1, 256 * 13 * 13 * 3])
+    reshape = tf.reshape(conv3_pool1, [-1, 256 * 5 * 5 * 3])
     printShape("reshape", reshape)
 
     local4 = tf.nn.relu(tf.matmul(reshape, generator_w['gw4']) + generator_b['gb4'])
