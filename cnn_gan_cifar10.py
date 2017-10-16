@@ -18,6 +18,7 @@ NUMBER_OF_SAMPLES = SAMPLE_WIDTH * SAMPLE_HEIGHT
 FILE_SAMPLE_OUTPUT_PATH = "out/"
 BATCH_SIZE = 128
 
+
 def sample_Z(m, n):
     return np.random.uniform(-1., 1., size=[m, n])
 
@@ -197,12 +198,9 @@ def generator(image):
     conv3_pool1 = pool(conv3_norm1, 'pool3')
     printShape("conv3_pool1", conv3_pool1)
 
-    print("debug")
-    print(conv3_pool1.get_shape()[-2])
-
     # local4
     # Move everything into depth so we can perform a single matrix multiply.
-    reshape = tf.reshape(conv3_pool1, [-1, 4096])
+    reshape = tf.reshape(conv3_pool1, [-1, 256 * 13 * 13 * 3])
     printShape("reshape", reshape)
 
     local4 = tf.nn.relu(tf.matmul(reshape, generator_w['gw4']) + generator_b['gb4'])
