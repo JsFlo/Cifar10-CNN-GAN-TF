@@ -15,7 +15,7 @@ DEBUG_PRINT_FREQUENCY = 50
 SAMPLE_WIDTH = 3
 SAMPLE_HEIGHT = 3
 NUMBER_OF_SAMPLES = SAMPLE_WIDTH * SAMPLE_HEIGHT
-FILE_SAMPLE_OUTPUT_PATH = "out/"
+FILE_SAMPLE_OUTPUT_PATH = "cout/"
 BATCH_SIZE = 128
 
 
@@ -165,7 +165,7 @@ generator_b = {
 }
 
 
-def generator(image):
+def generator(image, keep_prob):
     # conv1
     conv1 = tf.nn.conv2d(image, generator_w['gw1'], [1, 1, 1, 1], padding='SAME')
     conv1_pre_activation = tf.nn.bias_add(conv1, generator_b['gb1'])
@@ -216,8 +216,10 @@ def generator(image):
     local4 = tf.nn.relu(tf.matmul(reshape, generator_w['gw4']) + generator_b['gb4'])
     printShape("fc4", local4)
 
+    local4_dropout = tf.nn.dropout(local4, keep_prob)
+
     # local5
-    local5 = tf.nn.relu(tf.matmul(local4, generator_w['gw5']) + generator_b['gb5'])
+    local5 = tf.nn.relu(tf.matmul(local4_dropout, generator_w['gw5']) + generator_b['gb5'])
     printShape("local5", local5)
 
     # local6
@@ -336,12 +338,13 @@ def main(argv=None):  # pylint: disable=unused-argument
 
     # going to be randomly generated
     numberOfInputs = 10000
+    gen_keep_prob = tf.placeholder(tf.float32)
     # input to the generator of 100 numbers of noise
     Z = tf.placeholder(tf.float32, shape=[None, numberOfInputs])
     Z_reshaped = tf.reshape(Z, [-1, 100, 100, 1])
 
     # generator will take in Z (random noise of 100) and output an image that's 28 x 28
-    G_sample, _ = generator(Z_reshaped)
+    G_sample, _ = generator(Z_reshaped, gen_keep_prob)
     printShape("g_output", G_sample)
 
     # this discriminator will take in the real images
@@ -379,20 +382,21 @@ def main(argv=None):  # pylint: disable=unused-argument
     for it in range(TRAINING_STEPS):
 
         train_batch, labels = trainer.next_batch()
-        #print(len(train_batch))
+        # print(len(train_batch))
 
         if it % SAMPLE_FREQUENCY == 0:
             # sample the generator and save the plots
             samples = sess.run(G_sample,
-                               feed_dict={Z: sample_Z(len(train_batch), numberOfInputs)})
+                               feed_dict={Z: sample_Z(len(train_batch), numberOfInputs), gen_keep_prob: 1.0})
             fig = plot(samples)
             plt.savefig('{}{}.png'.format(FILE_SAMPLE_OUTPUT_PATH, str(it).zfill(3)), bbox_inches='tight')
             plt.close(fig)
 
         _, D_loss_curr = sess.run([D_solver, D_loss],
-                                  feed_dict={x_image: train_batch, Z: sample_Z(len(train_batch), numberOfInputs)})
+                                  feed_dict={x_image: train_batch, Z: sample_Z(len(train_batch), numberOfInputs)
+                                      , gen_keep_prob: 0.5})
         _, G_loss_curr = sess.run([G_solver, G_loss],
-                                  feed_dict={Z: sample_Z(len(train_batch), numberOfInputs)})
+                                  feed_dict={Z: sample_Z(len(train_batch), numberOfInputs), gen_keep_prob: 0.5})
 
         if it % DEBUG_PRINT_FREQUENCY == 0:
             print('Iter: {}'.format(it))
