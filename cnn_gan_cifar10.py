@@ -379,7 +379,7 @@ def main(argv=None):  # pylint: disable=unused-argument
     for it in range(TRAINING_STEPS):
 
         train_batch, labels = trainer.next_batch()
-        print(len(train_batch))
+        #print(len(train_batch))
 
         if it % SAMPLE_FREQUENCY == 0:
             # sample the generator and save the plots
