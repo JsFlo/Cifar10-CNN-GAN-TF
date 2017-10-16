@@ -9,9 +9,9 @@ import matplotlib.gridspec as gridspec
 
 IMAGE_SIZE = 32
 
-TRAINING_STEPS = 50
-SAMPLE_FREQUENCY = 10
-DEBUG_PRINT_FREQUENCY = 10000
+TRAINING_STEPS = 5000
+SAMPLE_FREQUENCY = 100
+DEBUG_PRINT_FREQUENCY = 50
 SAMPLE_WIDTH = 3
 SAMPLE_HEIGHT = 3
 NUMBER_OF_SAMPLES = SAMPLE_WIDTH * SAMPLE_HEIGHT
@@ -379,7 +379,7 @@ def main(argv=None):  # pylint: disable=unused-argument
     for it in range(TRAINING_STEPS):
 
         train_batch, labels = trainer.next_batch()
-        print(len(train_batch))
+        #print(len(train_batch))
 
         if it % SAMPLE_FREQUENCY == 0:
             # sample the generator and save the plots
