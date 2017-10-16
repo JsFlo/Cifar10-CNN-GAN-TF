@@ -36,7 +36,7 @@ def plot(samples):
     # ax.set_yticklabels([])
     # ax.set_aspect('equal')
     # convert 784 to 28 x 28
-    plt.imshow(samples[0].reshape(32, 32, 3), cmap='Greys_r')
+    plt.imshow(samples[0].reshape(32, 32, 3))
     return fig
 
 
@@ -379,20 +379,20 @@ def main(argv=None):  # pylint: disable=unused-argument
     for it in range(TRAINING_STEPS):
 
         train_batch, labels = trainer.next_batch()
-        #print(len(train_batch))
+        print(len(train_batch))
 
         if it % SAMPLE_FREQUENCY == 0:
             # sample the generator and save the plots
             samples = sess.run(G_sample,
-                               feed_dict={Z: sample_Z(129, numberOfInputs)})
+                               feed_dict={Z: sample_Z(len(train_batch), numberOfInputs)})
             fig = plot(samples)
             plt.savefig('{}{}.png'.format(FILE_SAMPLE_OUTPUT_PATH, str(it).zfill(3)), bbox_inches='tight')
             plt.close(fig)
 
         _, D_loss_curr = sess.run([D_solver, D_loss],
-                                  feed_dict={x_image: train_batch, Z: sample_Z(129, numberOfInputs)})
+                                  feed_dict={x_image: train_batch, Z: sample_Z(len(train_batch), numberOfInputs)})
         _, G_loss_curr = sess.run([G_solver, G_loss],
-                                  feed_dict={Z: sample_Z(129, numberOfInputs)})
+                                  feed_dict={Z: sample_Z(len(train_batch), numberOfInputs)})
 
         if it % DEBUG_PRINT_FREQUENCY == 0:
             print('Iter: {}'.format(it))
