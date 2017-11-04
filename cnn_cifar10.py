@@ -218,6 +218,9 @@ def main(argv=None):  # pylint: disable=unused-argument
             feed_dict={image_placeholder: validation_images, y_correct_labels: validation_labels}))
         print_loss_accuracy(loss_values, accuracy_values)
 
+        print("num of loss_values: {}".format(len(loss_values)))
+        print("num of accuracy values: {}".format(len(accuracy_values)))
+
 
 if __name__ == '__main__':
     tf.app.run()
